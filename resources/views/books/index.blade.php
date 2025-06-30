@@ -30,4 +30,3 @@
 @endsection
 
 
-#"add views: layout, index, create, edit for books"
