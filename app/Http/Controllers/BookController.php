@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\BookService;
 use App\Models\Book;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    public function index()
+    protected $bookService;
+
+    public function __construct(BookService $bookService)
     {
-        $books = Book::all();
-        return view('books.index', compact('books'));
+        $this->bookService = $bookService;
     }
 
-    public function create()
+    public function index()
     {
-        return view('books.create');
+        $books = $this->bookService->getAll();
+        return view('books.index', compact('books'));
     }
 
     public function store(Request $request)
@@ -28,14 +31,8 @@ class BookController extends Controller
             'paginas' => 'required|integer|min:1',
         ]);
 
-        Book::create($validated);
-
+        $this->bookService->create($validated);
         return redirect()->route('books.index')->with('success', 'Libro agregado correctamente');
-    }
-
-    public function edit(Book $book)
-    {
-        return view('books.edit', compact('book'));
     }
 
     public function update(Request $request, Book $book)
@@ -48,14 +45,13 @@ class BookController extends Controller
             'paginas' => 'required|integer|min:1',
         ]);
 
-        $book->update($validated);
-
+        $this->bookService->update($book, $validated);
         return redirect()->route('books.index')->with('success', 'Libro actualizado correctamente');
     }
 
     public function destroy(Book $book)
     {
-        $book->delete();
+        $this->bookService->delete($book);
         return redirect()->route('books.index')->with('success', 'Libro eliminado correctamente');
     }
 }
